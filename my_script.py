@@ -20,4 +20,9 @@ print("ROWS", type(rows), len(rows))
 
 for row in rows:
     print("--------------------")
-    print(type(row))
+    # print(type(row)) #> <class 'bs4.element.Tag'>
+    cells = row.findAll("td")
+    rank = cells[0].text
+    #team_name = cells[1].text #> includes the rank as well, so if you just want the team name...
+    team_name = cells[1].find("a").text
+    print(f"{rank}) {team_name}")
