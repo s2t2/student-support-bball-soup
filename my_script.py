@@ -15,35 +15,38 @@ soup = BeautifulSoup(open(html_filepath), features="lxml") # added the features 
 ratings_table = soup.find("table", id="ratings-table")
 print("RATINGS TABLE", type(ratings_table))
 
-rows = ratings_table.find("tbody").findAll("tr")
+rows = ratings_table.find("tbody").findAll("tr") # weird, seeing some thead rows (like Strength of Schedule) in here as well...
 print("ROWS", type(rows), len(rows))
 
-#all_rows = []
-#table_bodies = ratings_table.findAll("tbody")
-#print("BODIES", type(table_bodies), len(table_bodies))
-#
-#for tbody in table_bodies:
-#    rows = tbody.findAll("tr")
-#    all_rows.append(rows)
-#
-
-breakpoint()
+#breakpoint()
 
 for row in rows:
     print("--------------------")
     # print(type(row)) #> <class 'bs4.element.Tag'>
-    cells = row.findAll("td")
-    rank = cells[0].text
-    #team_name = cells[1].text #> includes the rank as well, so if you just want the team name...
-    team_name = cells[1].find("a").text
-    print(f"{rank}) {team_name}")
+    #cells = row.findAll("td")
+    # after the 40th team (end of first table), seeing:
+    #> IndexError: list index out of range
 
-    # hmm after number 40, seeing IndexError: list index out of range
-    # it appears the table contains multiple sets of thead + tbody. like:
-    # table
-    # ... thead
-    # ... tbody
-    # ... thead
-    # ... tbody
-    # ... thead
-    # ... tbody
+    try:
+        cells = row.findAll("td")
+        rank = cells[0].text
+        #team_name = cells[1].text #> includes the rank as well, so if you just want the team name...
+        team_name = cells[1].find("a").text
+        print(f"{rank}) {team_name}")
+    except IndexError as e:
+        print(e)
+        #breakpoint()
+        # looks like offending rows include:
+
+        # <tr class="thead1">
+        #   <th class="hard_left"></th>
+        #   <th class="next_left"></th>
+        #   <th colspan="3"></th>
+        #   <th class="divide" colspan="4">
+        #   </th><th class="divide" colspan="2">
+        #   </th><th class="divide" colspan="2"></th>
+        #   <th class="divide" colspan="6">Strength of Schedule</th>
+        #   <th class="divide" colspan="2">NCSOS</th>
+        # </tr>
+        # hoefully we can just skip them
+        #next()
